@@ -3,478 +3,969 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Traffic Dashboard</title>
+  <title>TrafficOS - Smart Dashboard</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #08101f;
-      --panel: rgba(15, 23, 42, 0.92);
-      --panel-strong: rgba(30, 41, 59, 0.96);
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --success: #34d399;
-      --warning: #fbbf24;
-      --danger: #f87171;
-      --accent: #38bdf8;
-      --card-radius: 24px;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      /* Brand Colors */
+      --bg: #09090b;
+      --bg-sidebar: rgba(9, 9, 11, 0.95);
+      --panel-bg: rgba(24, 24, 27, 0.6);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-glow: rgba(59, 130, 246, 0.5);
+      
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      
+      --shadow-sm: 0 4px 12px rgba(0,0,0,0.1);
+      --shadow-lg: 0 24px 48px rgba(0,0,0,0.4);
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
       min-height: 100vh;
-      font-family: "Inter", system-ui, sans-serif;
-      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.18), transparent 25%),
-                  radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.12), transparent 20%),
-                  linear-gradient(135deg, #07101d 0%, #0f172a 100%);
-      color: var(--text);
+      overflow-x: hidden;
+      /* Subtle background glow effects */
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"%3E%3Cg fill="none" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1"%3E%3Cpath d="M0 20h160M0 60h160M0 100h160M0 140h160M20 0v160M60 0v160M100 0v160M140 0v160"/%3E%3C/g%3E%3C/svg%3E') center / 160px 160px repeat;
-      pointer-events: none;
-      opacity: 0.35;
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
     }
 
-    .page {
-      position: relative;
-      padding: 32px;
-      max-width: 1280px;
-      margin: 0 auto;
-    }
-
-    .hero {
+    .app-container {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 24px;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--panel-border);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      backdrop-filter: blur(20px);
+    }
+
+    .logo {
+      display: flex;
       align-items: center;
-      margin-bottom: 28px;
-      padding: 28px;
-      border-radius: var(--card-radius);
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8));
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-    }
-
-    .hero-title {
-      max-width: 720px;
-    }
-
-    .hero-title h1 {
-      margin: 0;
-      font-size: clamp(2.2rem, 4vw, 3.6rem);
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-    }
-
-    .hero-title p {
-      margin: 18px 0 0;
-      color: var(--muted);
-      font-size: 1rem;
-      max-width: 620px;
-      line-height: 1.7;
-    }
-
-    .hero-badges {
-      display: flex;
-      flex-wrap: wrap;
       gap: 12px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 40px;
+      padding-left: 8px;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 18px;
-      border-radius: 16px;
-      background: rgba(148, 163, 184, 0.08);
-      color: var(--text);
-      min-width: 180px;
-      font-size: 0.97rem;
+    .logo i {
+      color: var(--primary);
+      font-size: 1.8rem;
+      filter: drop-shadow(0 0 8px var(--primary-glow));
     }
 
-    .badge .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 24px;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid rgba(148, 163, 184, 0.08);
-      border-radius: var(--card-radius);
-      padding: 26px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-
-    .panel h2 {
-      margin: 0 0 18px;
-      font-size: 1.35rem;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .field {
+    .sidebar nav {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      font-size: 0.95rem;
     }
 
-    .field label {
-      color: var(--muted);
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      background: rgba(15, 23, 42, 0.85);
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: rgba(56, 189, 248, 0.7);
-      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
-    }
-
-    .checkbox-row {
+    .sidebar nav a {
       display: flex;
       align-items: center;
-      gap: 10px;
-      grid-column: span 2;
-      color: var(--text);
+      gap: 12px;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: var(--text-muted);
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar nav a i {
+      font-size: 1.25rem;
+    }
+
+    .sidebar nav a:hover, .sidebar nav a.active {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+    }
+
+    .sidebar nav a.active {
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), transparent);
+      border-left: 3px solid var(--primary);
+      color: var(--primary);
+    }
+
+    /* --- Main Content --- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    /* Header */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      background: rgba(9, 9, 11, 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--panel-border);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--panel-border);
+      border-radius: 99px;
+      padding: 8px 16px;
+      width: 320px;
+      transition: all 0.2s ease;
+    }
+
+    .search-bar:focus-within {
+      border-color: rgba(59, 130, 246, 0.5);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-bar i {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-right: 8px;
+    }
+
+    .search-bar input {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-family: inherit;
+      outline: none;
+      width: 100%;
       font-size: 0.95rem;
     }
 
-    .checkbox-row input {
-      width: auto;
-      accent-color: #38bdf8;
-    }
-
-    .actions {
+    .header-actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 16px;
-      grid-column: span 2;
+      align-items: center;
+      gap: 20px;
     }
 
-    .button {
-      border: none;
-      border-radius: 14px;
-      padding: 14px 22px;
-      font-size: 1rem;
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      min-width: 150px;
+      position: relative;
+      transition: all 0.2s ease;
     }
 
-    .button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 34px rgba(56, 189, 248, 0.16);
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
     }
 
-    .button.primary {
-      background: linear-gradient(135deg, #22c55e, #38bdf8);
-      color: #fff;
+    .badge-dot {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 8px;
+      height: 8px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
     }
 
-    .button.secondary {
-      background: rgba(148, 163, 184, 0.12);
-      color: var(--text);
-      border: 1px solid rgba(148, 163, 184, 0.24);
+    .profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--panel-border);
     }
 
-    .stats {
+    /* Dashboard Content */
+    .dashboard-content {
+      padding: 32px 40px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-header {
+      margin-bottom: 32px;
+      animation: fadeInDown 0.5s ease;
+    }
+
+    .hero-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .hero-header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
     }
 
     .stat-card {
-      padding: 20px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(148, 163, 184, 0.12);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      animation: fadeInUp 0.5s ease backwards;
     }
 
-    .stat-card strong {
-      display: block;
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 1.8rem;
-      margin-bottom: 6px;
     }
 
-    .stat-card span {
-      color: var(--muted);
+    .stat-icon.blue {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--primary);
+      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.3);
+    }
+    
+    .stat-icon.red {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.3);
+    }
+    
+    .stat-icon.yellow {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.3);
+    }
+
+    .stat-info span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .stat-info strong {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    /* Content Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
+      animation: fadeInUp 0.5s ease 0.4s backwards;
+    }
+
+    .panel h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel h2 i {
+      color: var(--primary);
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      pointer-events: none;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      font-family: inherit;
       font-size: 0.95rem;
+      padding: 12px 14px 12px 42px;
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: all 0.2s ease;
+      appearance: none; /* for select */
     }
 
-    .table-wrap {
+    .input-wrapper select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+    }
+
+    .input-wrapper select option {
+      background: var(--bg-sidebar);
+      color: var(--text-main);
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+      border-color: var(--primary);
+      background: rgba(59, 130, 246, 0.05);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Custom Checkbox */
+    .checkbox-group {
+      margin-top: 8px;
+      margin-bottom: 24px;
+    }
+
+    .custom-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      user-select: none;
+    }
+
+    .custom-checkbox input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+      height: 20px;
+      width: 20px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .custom-checkbox:hover input ~ .checkmark {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .custom-checkbox input:checked ~ .checkmark {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .custom-checkbox input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    /* Buttons */
+    .form-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--primary-glow);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid var(--panel-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* Table Panel */
+    .table-container {
       overflow-x: auto;
+      margin: -10px; /* offset padding slightly for edge-to-edge look */
+      padding: 10px;
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
-      min-width: 740px;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 700px;
     }
 
-    thead th {
+    th {
       text-align: left;
-      padding: 16px 18px;
-      font-size: 0.95rem;
-      color: var(--muted);
+      padding: 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    tbody tr {
-      transition: background 0.2s ease;
-    }
-
-    tbody tr:hover {
-      background: rgba(255, 255, 255, 0.04);
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--panel-border);
     }
 
     td {
-      padding: 16px 18px;
-      color: var(--text);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      padding: 16px;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       vertical-align: middle;
+      transition: background 0.2s;
     }
 
+    tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badges */
     .badge-pill {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 0.85rem;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 99px;
+      font-size: 0.8rem;
       font-weight: 600;
+      line-height: 1;
     }
 
-    .badge-normal { background: rgba(34,197,94,0.15); color: #86efac; }
-    .badge-priority { background: rgba(56,189,248,0.15); color: #7dd3fc; }
-    .badge-overspeed { background: rgba(248,113,113,0.15); color: #fecaca; }
-    .badge-emergency { background: rgba(251,191,24,0.15); color: #fde68a; }
-
-    @media (max-width: 960px) {
-      .grid { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
-      .badge { min-width: 150px; }
+    .badge-pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
     }
 
-    @media (max-width: 680px) {
-      .hero {
-        padding: 22px;
+    .badge-normal { 
+      background: rgba(16, 185, 129, 0.1); 
+      color: #34d399; 
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .badge-normal::before { background: #34d399; }
+
+    .badge-priority { 
+      background: rgba(59, 130, 246, 0.1); 
+      color: #60a5fa; 
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    .badge-priority::before { background: #60a5fa; }
+
+    .badge-overspeed { 
+      background: rgba(239, 68, 68, 0.1); 
+      color: #f87171; 
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .badge-overspeed::before { background: #f87171; }
+
+    .badge-emergency { 
+      background: rgba(245, 158, 11, 0.1); 
+      color: #fbbf24; 
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .badge-emergency::before { background: #fbbf24; }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .content-grid {
+        grid-template-columns: 1fr;
       }
+    }
 
-      .hero-title h1 {
-        font-size: 2.2rem;
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none; /* In a real app, this would be a toggleable drawer */
+      }
+      .top-header {
+        padding: 16px 20px;
+      }
+      .dashboard-content {
+        padding: 24px 20px;
+      }
+      .search-bar {
+        width: 200px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="page">
-
-    <section class="hero">
-      <div class="hero-title">
-        <h1>Smart Traffic Dashboard</h1>
-        <p>Monitor vehicle events, track priority incidents, and inspect violations with a modern traffic operations interface.</p>
+  <div class="app-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <i class='bx bx-radar'></i>
+        <span>TrafficOS</span>
       </div>
-      <div class="hero-badges">
-        <span class="badge"><span class="dot"></span> Live event tracking</span>
-        <span class="badge"><span class="dot"></span> Traffic analytics</span>
-        <span class="badge"><span class="dot"></span> Emergency alerts</span>
+      <nav>
+        <a href="#" class="active"><i class='bx bx-grid-alt'></i> Dashboard</a>
+        <a href="#"><i class='bx bx-car'></i> Vehicles</a>
+        <a href="#"><i class='bx bx-bar-chart-alt-2'></i> Analytics</a>
+        <a href="#"><i class='bx bx-map-alt'></i> Live Map</a>
+        <a href="#"><i class='bx bx-cog'></i> Settings</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="search-bar">
+          <i class='bx bx-search'></i>
+          <input type="text" placeholder="Search vehicle ID or zone...">
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn"><i class='bx bx-bell'></i><span class="badge-dot"></span></button>
+          <div class="profile">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=38bdf8&color=fff" alt="Profile">
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="dashboard-content">
+        
+        <div class="hero-header">
+          <h1>Overview</h1>
+          <p>Monitor live vehicle events and track priority incidents globally.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class='bx bx-list-ul'></i></div>
+            <div class="stat-info">
+              <span>Total Events</span>
+              <strong id="totalEvents">0</strong>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red"><i class='bx bx-tachometer'></i></div>
+            <div class="stat-info">
+              <span>Overspeed Alerts</span>
+              <strong id="highSpeedCount">0</strong>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow"><i class='bx bxs-ambulance'></i></div>
+            <div class="stat-info">
+              <span>Emergency Vehicles</span>
+              <strong id="emergencyCount">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+          
+          <!-- Event Form Panel -->
+          <div class="panel form-panel">
+            <h2><i class='bx bx-add-to-queue'></i> Log Event</h2>
+            
+            <div class="form-group">
+              <label for="vehicleId">Vehicle ID</label>
+              <div class="input-wrapper">
+                <i class='bx bx-barcode'></i>
+                <input id="vehicleId" placeholder="e.g. MH-12-AB-1234">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="speed">Speed (km/h)</label>
+              <div class="input-wrapper">
+                <i class='bx bx-tachometer'></i>
+                <input id="speed" type="number" placeholder="e.g. 62">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="zone">Zone</label>
+              <div class="input-wrapper">
+                <i class='bx bx-map'></i>
+                <input id="zone" placeholder="e.g. Downtown Sector">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="status">Event Status</label>
+              <div class="input-wrapper">
+                <i class='bx bx-signal-4'></i>
+                <select id="status">
+                  <option value="Normal">Normal</option>
+                  <option value="Priority">Priority</option>
+                  <option value="Overspeed">Overspeed</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="checkbox-group">
+              <label class="custom-checkbox">
+                <input type="checkbox" id="emergency">
+                <span class="checkmark"></span>
+                Mark as Emergency Vehicle
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="sendData()"><i class='bx bx-send'></i> Submit</button>
+              <button class="btn btn-secondary" onclick="loadData()"><i class='bx bx-refresh'></i> Reload</button>
+            </div>
+          </div>
+
+          <!-- Data Table Panel -->
+          <div class="panel table-panel">
+            <h2><i class='bx bx-table'></i> Live Event Feed</h2>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Vehicle Reg.</th>
+                    <th>Speed</th>
+                    <th>Zone</th>
+                    <th>Status</th>
+                    <th>Emergency</th>
+                    <th>Fine Amt.</th>
+                  </tr>
+                </thead>
+                <tbody id="tableData">
+                  <!-- Data will be populated via JS -->
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                      <i class='bx bx-loader-alt bx-spin' style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+                      Loading feed...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
       </div>
-    </section>
-
-    <div class="grid">
-      <section class="panel">
-        <h2>Vehicle Event Input</h2>
-        <div class="form-grid">
-          <div class="field">
-            <label for="vehicleId">Vehicle ID</label>
-            <input id="vehicleId" placeholder="Enter vehicle identifier">
-          </div>
-
-          <div class="field">
-            <label for="speed">Speed</label>
-            <input id="speed" type="number" placeholder="e.g. 62">
-          </div>
-
-          <div class="field">
-            <label for="zone">Zone</label>
-            <input id="zone" placeholder="e.g. Downtown">
-          </div>
-
-          <div class="field">
-            <label for="status">Status</label>
-            <select id="status">
-              <option value="Normal">Normal</option>
-              <option value="Priority">Priority</option>
-              <option value="Overspeed">Overspeed</option>
-            </select>
-          </div>
-
-          <label class="checkbox-row">
-            <input type="checkbox" id="emergency">
-            Emergency vehicle
-          </label>
-
-          <div class="actions">
-            <button class="button primary" onclick="sendData()">Submit Event</button>
-            <button class="button secondary" onclick="loadData()">Reload Table</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2>Dashboard Summary</h2>
-        <div class="stats">
-          <div class="stat-card">
-            <strong id="totalEvents">0</strong>
-            <span>Total events</span>
-          </div>
-          <div class="stat-card">
-            <strong id="highSpeedCount">0</strong>
-            <span>Overspeed alerts</span>
-          </div>
-          <div class="stat-card">
-            <strong id="emergencyCount">0</strong>
-            <span>Emergency vehicles</span>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Vehicle</th>
-                <th>Speed</th>
-                <th>Zone</th>
-                <th>Status</th>
-                <th>Emergency</th>
-                <th>Fine</th>
-              </tr>
-            </thead>
-            <tbody id="tableData"></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-
-<script>
- const API = "https://traffic-backend-production-ba7e.up.railway.app/api";
-
-  function sendData() {
-    const speed = parseFloat(document.getElementById("speed").value) || 0;
-    const emergency = document.getElementById("emergency").checked;
-    const payload = {
-      vehicleId: document.getElementById("vehicleId").value,
-      speed,
-      zone: document.getElementById("zone").value,
-      emergency,
-      status: document.getElementById("status").value,
-      fine: calculateFine(speed, emergency)
-    };
-
-    fetch(API + "/event", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
-    })
-    .then(response => {
-      if (!response.ok) throw new Error("Failed to save event");
-      return response.json();
-    })
-    .then(() => {
-      alert("Data Saved!");
-      loadData();
-    })
-    .catch(() => alert("Unable to save event. Please try again."));
-  }
-
-  function loadData() {
-    fetch(API + "/events")
-      .then(res => res.json())
-      .then(data => {
-        const rows = data.map(e => {
-          const fine = e.fine ?? calculateFine(parseFloat(e.speed) || 0, e.emergency);
-
-          return `
-            <tr>
-              <td>${e.id}</td>
-              <td>${e.vehicleId}</td>
-              <td>${e.speed}</td>
-              <td>${e.zone}</td>
-              <td><span class="badge-pill ${getStatusClass(e.status)}">${e.status || '-'}</span></td>
-              <td><span class="badge-pill ${e.emergency ? 'badge-emergency' : 'badge-normal'}">${e.emergency ? 'Yes' : 'No'}</span></td>
-              <td>${fine > 0 ? fine : '-'}</td>
-            </tr>
-          `;
-        }).join("");
-
-        document.getElementById("tableData").innerHTML = rows;
-        updateSummary(data);
-      })
-      .catch(() => {
-        document.getElementById("tableData").innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 24px; color: var(--muted);">Unable to load data.</td></tr>';
-      });
-  }
-
-  function getStatusClass(status) {
-    if (status === 'Overspeed') return 'badge-overspeed';
-    if (status === 'Priority') return 'badge-priority';
-    return 'badge-normal';
-  }
-
-  function calculateFine(speed, emergency) {
-    if (emergency) return 0;
-    if (speed > 120) return 5000;
-    if (speed > 100) return 2000;
-    if (speed > 80) return 1000;
-    return 0;
-  }
-
-  function updateSummary(data) {
-    document.getElementById('totalEvents').textContent = data.length;
-    document.getElementById('highSpeedCount').textContent = data.filter(item => item.status === 'Overspeed').length;
-    document.getElementById('emergencyCount').textContent = data.filter(item => item.emergency).length;
-  }
-
-  loadData();
-</script>
+    </main>
   </div>
+
+  <script>
+    const API = "https://traffic-backend-production-ba7e.up.railway.app/api";
+
+    function sendData() {
+      const vehicleId = document.getElementById("vehicleId").value.trim();
+      if (!vehicleId) {
+        alert("Please enter a Vehicle ID");
+        return;
+      }
+
+      const speed = parseFloat(document.getElementById("speed").value) || 0;
+      const emergency = document.getElementById("emergency").checked;
+      const payload = {
+        vehicleId,
+        speed,
+        zone: document.getElementById("zone").value || "Unknown",
+        emergency,
+        status: document.getElementById("status").value,
+        fine: calculateFine(speed, emergency)
+      };
+
+      // Add a simple loading state to button
+      const submitBtn = document.querySelector('.btn-primary');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Submitting...";
+      submitBtn.disabled = true;
+
+      fetch(API + "/event", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Failed to save event");
+        return response.json();
+      })
+      .then(() => {
+        // Clear form
+        document.getElementById("vehicleId").value = "";
+        document.getElementById("speed").value = "";
+        document.getElementById("zone").value = "";
+        document.getElementById("emergency").checked = false;
+        document.getElementById("status").value = "Normal";
+        
+        loadData(); // Refresh data
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Unable to save event. Please try again.");
+      })
+      .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      });
+    }
+
+    function loadData() {
+      const tableBody = document.getElementById("tableData");
+      tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;"><i class='bx bx-loader-alt bx-spin' style="font-size: 2rem; margin-bottom: 10px;"></i><br>Loading feed...</td></tr>`;
+      
+      fetch(API + "/events")
+        .then(res => res.json())
+        .then(data => {
+          if (!data || data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">No events found.</td></tr>`;
+            updateSummary([]);
+            return;
+          }
+
+          // Sort by ID descending (newest first, assuming IDs are sequential)
+          data.sort((a, b) => b.id - a.id);
+
+          const rows = data.map(e => {
+            const fine = e.fine ?? calculateFine(parseFloat(e.speed) || 0, e.emergency);
+            
+            // Format fine as currency if > 0
+            const fineDisplay = fine > 0 ? `<span style="color: var(--danger); font-weight: 600;">$${fine.toLocaleString()}</span>` : '-';
+
+            return `
+              <tr>
+                <td style="color: var(--text-muted);">#${e.id}</td>
+                <td style="font-weight: 600;">${e.vehicleId}</td>
+                <td>${e.speed} <span style="font-size: 0.8em; color: var(--text-muted);">km/h</span></td>
+                <td>${e.zone || 'Unknown'}</td>
+                <td><span class="badge-pill ${getStatusClass(e.status)}">${e.status || '-'}</span></td>
+                <td><span class="badge-pill ${e.emergency ? 'badge-emergency' : 'badge-normal'}">${e.emergency ? 'Emergency' : 'Standard'}</span></td>
+                <td>${fineDisplay}</td>
+              </tr>
+            `;
+          }).join("");
+
+          tableBody.innerHTML = rows;
+          updateSummary(data);
+        })
+        .catch((err) => {
+          console.error(err);
+          tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 40px; color: var(--danger);"><i class="bx bx-error-circle" style="font-size: 2rem; margin-bottom: 10px;"></i><br>Unable to load data connection failed.</td></tr>';
+        });
+    }
+
+    function getStatusClass(status) {
+      if (status === 'Overspeed') return 'badge-overspeed';
+      if (status === 'Priority') return 'badge-priority';
+      return 'badge-normal';
+    }
+
+    function calculateFine(speed, emergency) {
+      if (emergency) return 0;
+      if (speed > 120) return 5000;
+      if (speed > 100) return 2000;
+      if (speed > 80) return 1000;
+      return 0;
+    }
+
+    // Animate numbers for stats
+    function animateValue(obj, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start);
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function updateSummary(data) {
+      const totalEl = document.getElementById('totalEvents');
+      const speedEl = document.getElementById('highSpeedCount');
+      const emergencyEl = document.getElementById('emergencyCount');
+
+      const newTotal = data.length;
+      const newSpeed = data.filter(item => item.status === 'Overspeed').length;
+      const newEmergency = data.filter(item => item.emergency).length;
+
+      animateValue(totalEl, parseInt(totalEl.innerText) || 0, newTotal, 800);
+      animateValue(speedEl, parseInt(speedEl.innerText) || 0, newSpeed, 800);
+      animateValue(emergencyEl, parseInt(emergencyEl.innerText) || 0, newEmergency, 800);
+    }
+
+    // Initial Load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+    });
+  </script>
 </body>
 </html>
