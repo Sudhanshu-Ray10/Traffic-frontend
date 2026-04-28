@@ -398,12 +398,15 @@
  const API = "https://traffic-backend-production-ba7e.up.railway.app/api";
 
   function sendData() {
+    const speed = parseFloat(document.getElementById("speed").value) || 0;
+    const emergency = document.getElementById("emergency").checked;
     const payload = {
       vehicleId: document.getElementById("vehicleId").value,
-      speed: parseFloat(document.getElementById("speed").value) || 0,
+      speed,
       zone: document.getElementById("zone").value,
-      emergency: document.getElementById("emergency").checked,
-      status: document.getElementById("status").value
+      emergency,
+      status: document.getElementById("status").value,
+      fine: calculateFine(speed, emergency)
     };
 
     fetch(API + "/event", {
@@ -426,17 +429,21 @@
     fetch(API + "/events")
       .then(res => res.json())
       .then(data => {
-        const rows = data.map(e => `
-          <tr>
-            <td>${e.id}</td>
-            <td>${e.vehicleId}</td>
-            <td>${e.speed}</td>
-            <td>${e.zone}</td>
-            <td><span class="badge-pill ${getStatusClass(e.status)}">${e.status || '-'}</span></td>
-            <td><span class="badge-pill ${e.emergency ? 'badge-emergency' : 'badge-normal'}">${e.emergency ? 'Yes' : 'No'}</span></td>
-            <td>${e.fine ?? '-'}</td>
-          </tr>
-        `).join("");
+        const rows = data.map(e => {
+          const fine = e.fine ?? calculateFine(parseFloat(e.speed) || 0, e.emergency);
+
+          return `
+            <tr>
+              <td>${e.id}</td>
+              <td>${e.vehicleId}</td>
+              <td>${e.speed}</td>
+              <td>${e.zone}</td>
+              <td><span class="badge-pill ${getStatusClass(e.status)}">${e.status || '-'}</span></td>
+              <td><span class="badge-pill ${e.emergency ? 'badge-emergency' : 'badge-normal'}">${e.emergency ? 'Yes' : 'No'}</span></td>
+              <td>${fine > 0 ? fine : '-'}</td>
+            </tr>
+          `;
+        }).join("");
 
         document.getElementById("tableData").innerHTML = rows;
         updateSummary(data);
@@ -450,6 +457,14 @@
     if (status === 'Overspeed') return 'badge-overspeed';
     if (status === 'Priority') return 'badge-priority';
     return 'badge-normal';
+  }
+
+  function calculateFine(speed, emergency) {
+    if (emergency) return 0;
+    if (speed > 120) return 5000;
+    if (speed > 100) return 2000;
+    if (speed > 80) return 1000;
+    return 0;
   }
 
   function updateSummary(data) {
